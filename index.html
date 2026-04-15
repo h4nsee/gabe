@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talking Gabe</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: transparent;
+      font-family: Arial, sans-serif;
+    }
+
+    .page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: transparent;
+      color: #f5f7fb;
+    }
+
+    .stage {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .character-wrap {
+      position: relative;
+      width: 620px;
+      height: 880px;
+      transform-origin: bottom center;
+      transition: transform 220ms ease;
+      pointer-events: auto;
+      animation: idleFloat 3.2s ease-in-out infinite;
+      transform: scale(0.9);
+    }
+
+    .shadow {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      width: 320px;
+      height: 44px;
+      transform: translateX(-50%);
+      border-radius: 50%;
+      background: rgba(0,0,0,0.28);
+      filter: blur(12px);
+    }
+
+    .chair-back {
+      position: absolute;
+      bottom: 180px;
+      left: 50%;
+      width: 290px;
+      height: 360px;
+      transform: translateX(-50%);
+      border-radius: 44px 44px 24px 24px;
+      background: linear-gradient(180deg, #3b2230, #23131e);
+      box-shadow: 0 16px 30px rgba(0,0,0,0.35);
+    }
+
+    .body {
+      position: absolute;
+      bottom: 170px;
+      left: 50%;
+      width: 250px;
+      height: 300px;
+      transform: translateX(-50%);
+      border-radius: 44px 44px 24px 24px;
+      background: linear-gradient(180deg, #23262d, #11131a);
+      border: 2px solid rgba(255,255,255,0.05);
+      transition: transform 160ms ease;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.28);
+    }
+
+    .tie {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      width: 28px;
+      height: 150px;
+      transform: translateX(-50%);
+      border-radius: 16px;
+      background: linear-gradient(180deg, #8c2222, #5d1212);
+    }
+
+    .arm {
+      position: absolute;
+      bottom: 240px;
+      right: 126px;
+      width: 140px;
+      height: 42px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #1c1f26, #0e1016);
+      transform-origin: 20px center;
+      transition: transform 180ms ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.24);
+    }
+
+    .head {
+      position: absolute;
+      bottom: 410px;
+      left: 50%;
+      width: 280px;
+      height: 280px;
+      transform: translateX(-50%);
+      border-radius: 48% 48% 46% 46%;
+      background: linear-gradient(180deg, #f3c59f, #d49b78);
+      box-shadow: 0 18px 28px rgba(0,0,0,0.22);
+      z-index: 3;
+    }
+
+    .eyebrow {
+      position: absolute;
+      top: 70px;
+      width: 42px;
+      height: 8px;
+      border-radius: 999px;
+      background: #67412e;
+      transform-origin: center;
+    }
+
+    .eyebrow-left { left: 68px; }
+    .eyebrow-right { right: 68px; transform: scaleX(-1); }
+
+    .eye {
+      position: absolute;
+      top: 102px;
+      width: 26px;
+      height: 18px;
+      border-radius: 999px;
+      background: #2a1c14;
+      transition: height 140ms ease;
+    }
+
+    .eye-left { left: 78px; }
+    .eye-right { right: 78px; }
+
+    .nose {
+      position: absolute;
+      top: 128px;
+      left: 50%;
+      width: 22px;
+      height: 48px;
+      transform: translateX(-50%);
+      border-radius: 18px;
+      background: rgba(146,88,62,0.35);
+    }
+
+    .mouth {
+      position: absolute;
+      left: 50%;
+      bottom: 76px;
+      width: 62px;
+      height: 10px;
+      transform: translateX(-50%);
+      background: #56211e;
+      border-radius: 999px;
+      transition: all 110ms ease;
+      box-shadow: inset 0 4px 10px rgba(255,255,255,0.08);
+    }
+
+    .beard {
+      position: absolute;
+      left: 50%;
+      bottom: 22px;
+      width: 190px;
+      height: 88px;
+      transform: translateX(-50%);
+      border-radius: 40px 40px 54px 54px;
+      background: linear-gradient(180deg, #f4f4f4, #cfcfcf);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+    }
+
+    .desk {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      width: 560px;
+      height: 120px;
+      transform: translateX(-50%);
+      border-radius: 18px;
+      background: linear-gradient(180deg, #5f4028, #3b2819);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.32);
+    }
+
+    .hitbox {
+      position: absolute;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .head-hitbox {
+      left: 50%;
+      bottom: 410px;
+      width: 280px;
+      height: 280px;
+      transform: translateX(-50%);
+      border-radius: 48%;
+      z-index: 10;
+    }
+
+    .body-hitbox {
+      left: 50%;
+      bottom: 170px;
+      width: 250px;
+      height: 300px;
+      transform: translateX(-50%);
+      border-radius: 32px;
+      z-index: 9;
+    }
+
+    .arm-hitbox {
+      right: 104px;
+      bottom: 220px;
+      width: 160px;
+      height: 80px;
+      border-radius: 40px;
+      z-index: 9;
+    }
+
+    .panel {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      width: 380px;
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(13, 16, 25, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.3);
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 4px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .status-box {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.05);
+      margin-bottom: 14px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .btn-primary, .btn-secondary, .floating-btn {
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      border: none;
+      background: #f0b35f;
+      color: #1d150c;
+    }
+
+    .btn-secondary, .floating-btn {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+      color: #f5f7fb;
+    }
+
+    .help-box {
+      font-size: 13px;
+      line-height: 1.7;
+      opacity: 0.82;
+    }
+
+    .floating-btn {
+      position: absolute;
+      top: 24px;
+      left: 24px;
+      display: none;
+    }
+
+    @keyframes idleFloat {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="stage">
+      <div class="character-wrap" id="character">
+        <div class="shadow"></div>
+        <div class="arm" id="arm"></div>
+        <div class="body" id="body"><div class="tie"></div></div>
+        <div class="head">
+          <div class="eyebrow eyebrow-left" id="brow-left"></div>
+          <div class="eyebrow eyebrow-right"></div>
+          <div class="eye eye-left" id="eye-left"></div>
+          <div class="eye eye-right" id="eye-right"></div>
+          <div class="nose"></div>
+          <div class="mouth" id="mouth"></div>
+          <div class="beard"></div>
+        </div>
+        <div class="chair-back"></div>
+        <div class="desk"></div>
+
+        <button class="hitbox head-hitbox" id="headHitbox" aria-label="Зона головы"></button>
+        <button class="hitbox body-hitbox" id="bodyHitbox" aria-label="Зона тела"></button>
+        <button class="hitbox arm-hitbox" id="armHitbox" aria-label="Зона руки"></button>
+      </div>
+    </div>
+
+    <div class="panel" id="panel">
+      <div class="panel-header">
+        <div>
+          <div class="title">Talking Gabe</div>
+          <div class="subtitle">Простой рабочий прототип</div>
+        </div>
+        <button class="btn-secondary" id="toggleUiBtn">Скрыть UI</button>
+      </div>
+
+      <div class="status-box">
+        <div><strong>Состояние:</strong> <span id="stateText">idle</span></div>
+        <div><strong>Статус:</strong> <span id="statusText">Готов к стриму.</span></div>
+      </div>
+
+      <div class="button-grid">
+        <button class="btn-primary" id="annoyedBtn">Реакция головы</button>
+        <button class="btn-primary" id="laughBtn">Реакция тела</button>
+        <button class="btn-secondary" id="gestureBtn">Реакция руки</button>
+        <button class="btn-secondary" id="idleBtn">Сброс в idle</button>
+      </div>
+
+      <div class="help-box">
+        <div><strong>Проверка:</strong> кликай по голове, телу или руке</div>
+        <div><strong>Цель:</strong> убедиться, что GitHub Pages работает</div>
+      </div>
+    </div>
+
+    <button class="floating-btn" id="showUiBtn">Показать UI</button>
+  </div>
+
+  <script>
+    const character = document.getElementById('character');
+    const body = document.getElementById('body');
+    const arm = document.getElementById('arm');
+    const mouth = document.getElementById('mouth');
+    const eyeLeft = document.getElementById('eye-left');
+    const browLeft = document.getElementById('brow-left');
+    const panel = document.getElementById('panel');
+    const showUiBtn = document.getElementById('showUiBtn');
+    const stateText = document.getElementById('stateText');
+    const statusText = document.getElementById('statusText');
+
+    let resetTimer = null;
+
+    function setState(state, status) {
+      clearTimeout(resetTimer);
+      stateText.textContent = state;
+      statusText.textContent = status;
+
+      character.style.transform = 'scale(0.9)';
+      body.style.transform = 'translateX(-50%) translateY(0px)';
+      arm.style.transform = 'rotate(0deg)';
+      mouth.style.width = '62px';
+      mouth.style.height = '10px';
+      mouth.style.borderRadius = '999px';
+      eyeLeft.style.height = '18px';
+      browLeft.style.transform = 'rotate(0deg)';
+
+      if (state === 'annoyed') {
+        character.style.transform = 'scale(0.9) translateY(-4px) rotate(-1deg)';
+        browLeft.style.transform = 'rotate(-12deg)';
+        mouth.style.width = '56px';
+      }
+
+      if (state === 'laugh') {
+        character.style.transform = 'scale(0.9) translateY(4px) rotate(1deg)';
+        body.style.transform = 'translateX(-50%) translateY(8px)';
+        mouth.style.height = '24px';
+        mouth.style.borderRadius = '14px';
+        eyeLeft.style.height = '8px';
+      }
+
+      if (state === 'gesture') {
+        character.style.transform = 'scale(0.9) translateX(4px)';
+        arm.style.transform = 'rotate(-32deg)';
+      }
+
+      if (state !== 'idle') {
+        resetTimer = setTimeout(() => {
+          setState('idle', 'Ждёт следующую шутку.');
+        }, 1800);
+      }
+    }
+
+    document.getElementById('headHitbox').addEventListener('click', () => {
+      setState('annoyed', 'Клик по голове. Недовольная реакция.');
+    });
+
+    document.getElementById('bodyHitbox').addEventListener('click', () => {
+      setState('laugh', 'Клик по телу. Реакция смеха.');
+    });
+
+    document.getElementById('armHitbox').addEventListener('click', () => {
+      setState('gesture', 'Клик по руке. Жест.');
+    });
+
+    document.getElementById('annoyedBtn').addEventListener('click', () => {
+      setState('annoyed', 'Кнопкой вызвана реакция головы.');
+    });
+
+    document.getElementById('laughBtn').addEventListener('click', () => {
+      setState('laugh', 'Кнопкой вызвана реакция тела.');
+    });
+
+    document.getElementById('gestureBtn').addEventListener('click', () => {
+      setState('gesture', 'Кнопкой вызвана реакция руки.');
+    });
+
+    document.getElementById('idleBtn').addEventListener('click', () => {
+      setState('idle', 'Сброшено в idle.');
+    });
+
+    document.getElementById('toggleUiBtn').addEventListener('click', () => {
+      panel.style.display = 'none';
+      showUiBtn.style.display = 'block';
+    });
+
+    showUiBtn.addEventListener('click', () => {
+      panel.style.display = 'block';
+      showUiBtn.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
